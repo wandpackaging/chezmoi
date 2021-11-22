@@ -1,0 +1,35 @@
+name: Publish debian packages on cloudsmith
+
+on:
+  schedule:
+    - cron: '30 13 * * *'
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    container:
+      image: "ubuntu:latest"
+    environment:
+      name: "release"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get -y upgrade
+          apt-get -y install curl jq lsb-release
+      - name: Download new packages
+        run: |
+            ./publish.sh
+      - if: ${{ env.NEW_PACKAGES > 0 }}
+        name: Publish packages to cloudsmith
+        uses: wanduow/action-cloudsmith-upload-packages@v1
+        with:
+          path: packages/
+          repo: wand/chezmoi
+          username: brad-cowie
+          api_key: ${{ secrets.CLOUDSMITH_API_KEY }}
