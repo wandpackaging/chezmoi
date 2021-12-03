@@ -28,6 +28,19 @@ for deb_file in "${deb_files[@]}"; do
         mv "${GITHUB_WORKSPACE}/${pkg_filename}" "${package_path}/${pkg_filename}"
         new_packages=$((new_packages+=1))
     fi
+
+    if [ "${pkg_arch}" == "arm" ]; then
+        # Convert armel package to armhf
+        dpkg-deb -x "${GITHUB_WORKSPACE}/${pkg_filename}" "${GITHUB_WORKSPACE}/chezmoi_armhf"
+        dpkg-deb -e "${GITHUB_WORKSPACE}/${pkg_filename}" "${GITHUB_WORKSPACE}/chezmoi_armhf/DEBIAN"
+        sed -i 's/Architecture: arm$/Architecture: armhf/' "${GITHUB_WORKSPACE}/chezmoi_armhf/DEBIAN/control"
+        armhf_filename=$(dpkg-deb -Z xz -b "${GITHUB_WORKSPACE}/chezmoi_armhf" "${GITHUB_WORKSPACE}" | \
+            grep "building package" | grep -Eo "[^']+\.deb" | xargs basename)
+        if ! curl -1sLf "${deb_repo_packages_url}" 2>&1 | grep "${armhf_filename}" > /dev/null; then
+            mv "${GITHUB_WORKSPACE}/${armhf_filename}" "${package_path}/${armhf_filename}"
+            new_packages=$((new_packages+=1))
+        fi
+    fi
 done
 
 echo "NEW_PACKAGES=${new_packages}" >> "${GITHUB_ENV}"
