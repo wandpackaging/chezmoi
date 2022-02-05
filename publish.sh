@@ -31,11 +31,20 @@ for deb_file in "${deb_files[@]}"; do
 
     if [ "${pkg_arch}" == "arm" ]; then
         # Convert armel package to armhf
-        dpkg-deb -x "${GITHUB_WORKSPACE}/${pkg_filename}" "${GITHUB_WORKSPACE}/chezmoi_armhf"
-        dpkg-deb -e "${GITHUB_WORKSPACE}/${pkg_filename}" "${GITHUB_WORKSPACE}/chezmoi_armhf/DEBIAN"
-        sed -i 's/Architecture: arm$/Architecture: armhf/' "${GITHUB_WORKSPACE}/chezmoi_armhf/DEBIAN/control"
-        armhf_filename=$(dpkg-deb -Z xz -b "${GITHUB_WORKSPACE}/chezmoi_armhf" "${GITHUB_WORKSPACE}" | \
-            grep "building package" | grep -Eo "[^']+\.deb" | xargs basename)
+        mkdir -p "${GITHUB_WORKSPACE}/chezmoi_armhf/DEBIAN"
+        ar p "${package_path}/${pkg_filename}" control.tar.gz | \
+            tar -xz -C "${GITHUB_WORKSPACE}/chezmoi_armhf/DEBIAN"
+        sed -i 's/Architecture: arm$/Architecture: armhf/' \
+            "${GITHUB_WORKSPACE}/chezmoi_armhf/DEBIAN/control"
+        (
+          cd "${GITHUB_WORKSPACE}/chezmoi_armhf/DEBIAN/"; \
+          tar -czf "${GITHUB_WORKSPACE}/chezmoi_armhf/control.tar.gz" -- *
+        )
+        armhf_filename=${pkg_filename//armel/armhf}
+        cp "${package_path}/${pkg_filename}" "${GITHUB_WORKSPACE}/${armhf_filename}"
+        ar r "${GITHUB_WORKSPACE}/${armhf_filename}" \
+            "${GITHUB_WORKSPACE}/chezmoi_armhf/control.tar.gz"
+
         if ! curl -1sLf "${deb_repo_packages_url}" 2>&1 | grep "${armhf_filename}" > /dev/null; then
             mv "${GITHUB_WORKSPACE}/${armhf_filename}" "${package_path}/${armhf_filename}"
             new_packages=$((new_packages+=1))
