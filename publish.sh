@@ -3,7 +3,7 @@
 set -euo pipefail
 
 github_api_url="https://api.github.com/repos/twpayne/chezmoi/releases/latest"
-cloudsmith_config_url="https://dl.cloudsmith.io/public/wand/chezmoi/config.deb.txt?distro=$(lsb_release -is)&codename=$(lsb_release -sc)"
+cloudsmith_config_url="https://dl.cloudsmith.io/public/wand/chezmoi/config.deb.txt?distro=$(lsb_release -is | awk '{print tolower($0)}')&codename=$(lsb_release -sc)"
 
 deb_repo_url=$(curl -1sLf "${cloudsmith_config_url}" | grep "deb " | awk '{print $2}')
 
