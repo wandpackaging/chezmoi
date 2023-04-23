@@ -21,10 +21,10 @@ jobs:
         run: |
           apt-get update
           apt-get -y upgrade
-          apt-get -y install curl jq lsb-release binutils
+          apt-get -y install curl jq lsb-release binutils git
       - name: Download new packages
         run: |
-            ./publish.sh
+          ./publish.sh
       - if: ${{ env.NEW_PACKAGES > 0 }}
         name: Publish packages to cloudsmith
         uses: wandnz/action-cloudsmith-upload-packages@v1
