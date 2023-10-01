@@ -21,7 +21,7 @@ jobs:
           apt-get -y upgrade
           apt-get -y install curl jq lsb-release binutils git
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download new packages
         run: |
           ./publish.sh
