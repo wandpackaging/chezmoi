@@ -1,0 +1,31 @@
+---
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build debian package
+    runs-on: ubuntu-latest
+    environment:
+      name: "release"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Build debian packages
+        run: ./build.sh
+
+      - name: Publish debian packages to cloudsmith
+        uses: wandnz/action-cloudsmith-upload-packages@v1
+        with:
+          path: packages/
+          repo: wand/chezmoi
+          username:  wand-chezmoi-github-action
+          api_key: ${{ secrets.CLOUDSMITH_API_KEY }}
