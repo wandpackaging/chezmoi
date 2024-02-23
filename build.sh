@@ -4,8 +4,8 @@ set -euo pipefail
 
 set -x
 
-apt-get update
-apt-get -y install binutils curl jq
+sudo apt-get update
+sudo apt-get -y install binutils curl jq
 
 git_tag="$(cd chezmoi && git describe --tags)"
 
