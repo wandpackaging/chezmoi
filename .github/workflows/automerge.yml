@@ -5,7 +5,7 @@ on: pull_request
 
 jobs:
   automerge:
-    name: Build debian package
+    name: Automerge PR
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
