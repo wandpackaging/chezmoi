@@ -43,6 +43,7 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Create pull request
+        id: create-pull-request
         uses: peter-evans/create-pull-request@v6
         with:
           branch: update-submodules
@@ -52,3 +53,9 @@ jobs:
             Bump git submodules to latest tag
 
             ${{ steps.bump-submodules.outputs.GIT_OUTPUT }}
+
+      - name: Enable pull request automerge
+        if: ${{ steps.create-pull-request.outputs.pull-request-number }}
+        run: gh pr merge --merge --auto "${{ steps.create-pull-request.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
