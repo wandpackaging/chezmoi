@@ -7,11 +7,14 @@ jobs:
   automerge:
     name: Automerge PR
     runs-on: ubuntu-latest
+    environment:
+      name: "pr"
     permissions:
       pull-requests: write
       contents: write
     steps:
       - uses: peter-evans/enable-pull-request-automerge@v3
         with:
+          token: ${{ secrets.PAT }}
           pull-request-number: ${{ github.event.pull_request.number }}
           merge-method: squash
