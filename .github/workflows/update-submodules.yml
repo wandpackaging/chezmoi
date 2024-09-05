@@ -50,10 +50,11 @@ jobs:
 
       - name: Create pull request
         id: create-pull-request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ steps.github-app-token.outputs.token }}
           branch: update-submodules
+          sign-commits: true
           commit-message: "build(deps): Bump git submodules"
           title: "build(deps): Bump git submodules"
           body: |
