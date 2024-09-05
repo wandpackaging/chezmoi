@@ -54,6 +54,7 @@ jobs:
         with:
           token: ${{ steps.github-app-token.outputs.token }}
           branch: update-submodules
+          sign-commits: true
           commit-message: "build(deps): Bump git submodules"
           title: "build(deps): Bump git submodules"
           body: |
